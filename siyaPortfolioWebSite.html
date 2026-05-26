@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Siyabonga — Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0a;
+      --surface:   #111111;
+      --border:    #1f1f1f;
+      --accent:    #1E90FF;
+      --accent2:   #ff6b35;
+      --text:      #e8e8e8;
+      --muted:     #555;
+      --mono:      'Fragment Mono', monospace;
+      --serif:     'DM Serif Display', serif;
+      --sans:      'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Custom cursor ── */
+    #cursor {
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease, background 0.2s;
+      mix-blend-mode: difference;
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s cubic-bezier(.25,.46,.45,.94), opacity 0.3s;
+      opacity: 0.5;
+    }
+
+    /* ── Scanline overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9000;
+    }
+
+    /* ── Noise texture ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 8999;
+      opacity: 0.4;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.25rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      animation: slideDown 0.6s ease both;
+    }
+    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .nav-logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 0 3rem;
+      padding-top: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid-line {
+      position: absolute;
+      background: var(--border);
+      pointer-events: none;
+    }
+    .hero-grid-line.v { width: 1px; height: 100%; top: 0; }
+    .hero-grid-line.h { height: 1px; width: 100%; left: 0; }
+    .hero-grid-line:nth-child(1) { left: 33%; }
+    .hero-grid-line:nth-child(2) { left: 66%; }
+    .hero-grid-line:nth-child(3) { top: 40%; }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+    .hero-tag::before { content: '// '; color: var(--muted); }
+
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.45s ease both;
+    }
+    .hero-name em { font-style: italic; color: var(--accent); }
+
+    .hero-role {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.6s ease both;
+    }
+    .hero-role .cursor-blink {
+      display: inline-block;
+      width: 2px; height: 1em;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .hero-desc {
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #aaa;
+      max-width: 480px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.75s ease both;
+    }
+
+    .hero-cta {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.9s ease both;
+    }
+    .btn {
+      padding: 0.75rem 1.75rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid;
+      transition: all 0.25s;
+      cursor: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 4rem 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .terminal-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+    .terminal-bar {
+      background: #1a1a1a;
+      padding: 0.6rem 1rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; }
+    .dot.y { background: #febc2e; }
+    .dot.g { background: #28c840; }
+    .terminal-title { margin-left: auto; font-size: 0.65rem; color: var(--muted); }
+    .terminal-body { padding: 1.25rem 1.5rem; font-size: 0.78rem; line-height: 2; }
+    .t-line { display: flex; gap: 0.5rem; }
+    .t-prompt { color: var(--accent); flex-shrink: 0; }
+    .t-cmd { color: var(--text); }
+    .t-out { color: var(--muted); padding-left: 0; }
+    .t-key { color: var(--accent2); }
+    .t-val { color: #7dd3fc; }
+    .t-str { color: #a5f3a0; }
+
+    /* ── Section base ── */
+    section { padding: 6rem 3rem; border-top: 1px solid var(--border); }
+    .section-header {
+      display: flex; align-items: baseline; gap: 1rem;
+      margin-bottom: 4rem;
+    }
+    .section-num {
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-left: 1rem;
+    }
+
+    /* ── About ── */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .about-text p {
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #bbb;
+      margin-bottom: 1.25rem;
+    }
+    .about-text p strong { color: var(--text); font-weight: 700; }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+    .stack-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .stack-item:hover { color: var(--accent); }
+    .stack-item::before { content: '▸'; color: var(--accent); font-size: 0.65rem; }
+
+    /* ── Projects ── */
+    #projects .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .project-card {
+      background: var(--bg);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.25s;
+      cursor: none;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.3s ease;
+    }
+    .project-card:hover { background: var(--surface); }
+    .project-card:hover::before { transform: scaleY(1); }
+    .project-card:nth-child(even)::before { background: var(--accent2); }
+
+    .project-num {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .project-title {
+      font-family: var(--sans);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+    .project-desc {
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: #777;
+      margin-bottom: 1.5rem;
+    }
+    .project-tags {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    .tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .project-links { display: flex; gap: 1rem; }
+    .project-link {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .project-link:hover { color: var(--accent); }
+    .project-link::after { content: ' →'; }
+
+    /* ── Skills ── */
+    #skills .skills-layout {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+    .skill-category h3 {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .skill-list { list-style: none; }
+    .skill-list li {
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      color: #888;
+      padding: 0.4rem 0;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: color 0.2s, padding-left 0.2s;
+    }
+    .skill-list li:hover { color: var(--text); padding-left: 0.5rem; }
+    .skill-list li::before { content: '—'; color: var(--border); font-size: 0.7rem; }
+
+    /* ── Contact ── */
+    #contact {
+      text-align: center;
+      padding: 8rem 3rem;
+    }
+    .contact-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .contact-heading {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    .contact-heading em { font-style: italic; color: var(--accent); }
+    .contact-sub {
+      font-family: var(--sans);
+      font-size: 1rem;
+      color: #777;
+      max-width: 480px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+    .contact-links {
+      display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-left {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .footer-left span { color: var(--accent); }
+    .footer-right {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Scroll reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      #hero { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; }
+      .hero-right { justify-content: flex-start; }
+      section { padding: 4rem 1.5rem; }
+      #about .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      #skills .skills-layout { grid-template-columns: 1fr 1fr; gap: 2rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      #skills .skills-layout { grid-template-columns: 1fr; }
+      #contact { padding: 5rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">SN/</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid-line v"></div>
+    <div class="hero-grid-line v" style="left:66%"></div>
+    <div class="hero-grid-line h" style="top:40%"></div>
+
+    <div class="hero-left">
+      <p class="hero-tag">available for opportunities</p>
+      <h1 class="hero-name">Siya<em>bonga</em><br>Phiri</h1>
+      <p class="hero-role">
+        <span id="typed-role"></span><span class="cursor-blink"></span>
+      </p>
+      <p class="hero-desc">
+        Third-year Computer Science student building thoughtful software at the intersection of
+        systems thinking, machine learning, and human experience.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="https://github.com/Siyabonga003" target="_blank" class="btn btn-secondary">GitHub</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="terminal-card">
+        <div class="terminal-bar">
+          <span class="dot r"></span>
+          <span class="dot y"></span>
+          <span class="dot g"></span>
+          <span class="terminal-title">~/siyabonga $ whoami</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">cat profile.json</span></div>
+          <div class="t-line"><span class="t-out">{</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"name"</span><span class="t-out">:</span> <span class="t-str">"Siyabonga Phiri"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"role"</span><span class="t-out">:</span> <span class="t-str">"CS Student & Developer"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"year"</span><span class="t-out">:</span> <span class="t-val">3</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"focus"</span><span class="t-out">: [</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"Software Engineering"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"LLMs &amp; AI"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"DevOps"</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"Mobile App Devolopment"</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-out">],</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"github"</span><span class="t-out">:</span> <span class="t-str">"@Siyabonga003"</span></div>
+          <div class="t-line"><span class="t-out">}</span></div>
+          <div class="t-line" style="margin-top:0.5rem"><span class="t-prompt">$</span><span class="t-cmd cursor-blink" style="display:inline-block;width:8px;height:0.85em;background:#e8e8e8;margin-left:4px;vertical-align:middle;animation:blink 1s step-end infinite"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-num">01</span>
+      <h2 class="section-title">About</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>
+          I'm a <strong>third-year Computer Science student</strong> at MULUNGUSHI UNIVERSITY,
+          with a deep curiosity for how software systems work at every layer — from low-level C
+          to cloud-deployed ML pipelines.
+        </p>
+        <p>
+          My work spans <strong>full-stack web development</strong>, Mobile Appp Development, computer vision, large language model integrations,
+          and DevOps tooling. I'm drawn to projects that sit at the intersection of engineering
+          hardness and real human impact.
+        </p>
+        <p>
+          Beyond code, I explore competitive programming on LeetCode, contribute to open-source,
+          and think about how technology can serve communities meaningfully — including projects
+          that blend faith, digital wellness, and software design.
+        </p>
+      </div>
+      <div class="reveal">
+        <p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem">Primary Stack</p>
+        <div class="stack-grid">
+          <div class="stack-item">Java</div>
+          <div class="stack-item">Python</div>
+          <div class="stack-item">JavaScript</div>
+          <div class="stack-item">Dart / Flutter</div>
+          <div class="stack-item">SQL</div>
+          <div class="stack-item">Node.js</div>
+          <div class="stack-item">Django</div>
+          <div class="stack-item">Git / GitHub</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <p class="project-num">001</p>
+        <h3 class="project-title">Gesture-Controlled Mouse</h3>
+        <p class="project-desc">Real-time hand tracking system that maps MediaPipe hand landmarks to cursor movement and gesture-based click/scroll controls using a webcam.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span>
+          <span class="tag">OpenCV</span>
+          <span class="tag">MediaPipe</span>
+          <span class="tag">PyAutoGUI</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">002</p>
+        <h3 class="project-title">Local LLM Chat Interface</h3>
+        <p class="project-desc">A clean, self-hosted chat UI for interacting with local language models. Designed for privacy-first AI use without relying on external APIs.</p>
+        <div class="project-tags">
+          <span class="tag">React</span>
+          <span class="tag">TypeScript</span>
+          <span class="tag">Ollama</span>
+          <span class="tag">LLMs</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">003</p>
+        <h3 class="project-title">RAG Pipeline</h3>
+        <p class="project-desc">Retrieval-Augmented Generation pipeline enabling document-grounded question answering. Combines vector search with LLM inference for accurate, cited responses.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span>
+          <span class="tag">LangChain</span>
+          <span class="tag">Vector DB</span>
+          <span class="tag">NLP</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">004</p>
+        <h3 class="project-title">WordLock — Digital Wellness PWA</h3>
+        <p class="project-desc">A React PWA that gates social media access behind Bible verse reading. Features streak counters, verse quizzes, AI devotional reflections, and a friends leaderboard.</p>
+        <div class="project-tags">
+          <span class="tag">React</span>
+          <span class="tag">PWA</span>
+          <span class="tag">TypeScript</span>
+          <span class="tag">AI</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">005</p>
+        <h3 class="project-title">ML Patient Classifier</h3>
+        <p class="project-desc">Decision Tree and Random Forest classifiers on a patient dataset, with SMOTE for class imbalance, hyperparameter tuning, and ensemble method evaluation.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span>
+          <span class="tag">scikit-learn</span>
+          <span class="tag">SMOTE</span>
+          <span class="tag">Data Science</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">006</p>
+        <h3 class="project-title">Glassmorphism Start Menu (Windhawk Mod)</h3>
+        <p class="project-desc">A custom Windows shell replacement written in C++ using GDI rendering, global mouse hooks, and power control — replacing the default Start menu with a glass-style launcher.</p>
+        <div class="project-tags">
+          <span class="tag">C++</span>
+          <span class="tag">WinAPI</span>
+          <span class="tag">GDI</span>
+          <span class="tag">Systems</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Skills</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-layout">
+      <div class="skill-category reveal">
+        <h3>Languages</h3>
+        <ul class="skill-list">
+          <li>Python</li>
+          <li>JavaScript</li>
+          <li>Java</li>
+          <li>Dart</li>
+          <li>SQL</li>
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>Bash</li>
+        </ul>
+      </div>
+      <div class="skill-category reveal">
+        <h3>Frameworks & Tools</h3>
+        <ul class="skill-list">
+          <li>Node.js & Express</li>
+          <li>Django</li>
+          <li>Flutter</li>
+          <li>Angular</li>
+          <li>Git & GitHub</li>
+        
+        </ul>
+      </div>
+      <div class="skill-category reveal">
+        <h3>Domains</h3>
+        <ul class="skill-list">
+          <li>Software Engineering</li>
+          <li>LLMs & AI Integration</li>
+          <li>Mobile App Development</li>
+          <li>Computer Vision</li>
+          <li>DevOps & Cloud</li>
+          <li>Data Science & ML</li>
+          <li>Systems Programming</li>
+          <li>Backend Engineering</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="contact-eyebrow reveal">Get in touch</p>
+    <h2 class="contact-heading reveal">Let's build something<br><em>worth shipping.</em></h2>
+    <p class="contact-sub reveal">
+      Open to internships, collaborations, and interesting problems.
+      Reach out via any of the channels below.
+    </p>
+    <div class="contact-links reveal">
+      <a href="https://github.com/Siyabonga003" target="_blank" class="btn btn-primary">GitHub</a>
+      <a href="https:// www.linkedin.com/in/siyabonga-phiri-a78031410  " target="_blank" class="btn btn-secondary">LinkedIn</a>
+      <a href="https://www.instagram.com" target="_blank" class="btn btn-secondary">Instagram</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-left">Designed & built by <span>Siyabonga Phiri</span> — <span>2025</span></p>
+    <p class="footer-right">@Siyabonga003</p>
+  </footer>
+
+  <script>
+    // ── Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    document.querySelectorAll('a, button, .project-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform += ' scale(1.8)';
+        ring.style.opacity = '1';
+      });
+      el.addEventListener('mouseleave', () => { ring.style.opacity = '0.5'; });
+    });
+
+    // ── Typed role
+    const roles = [
+      'Software Engineer',
+      'Full-Stack Developer',
+      'ML Engineer',
+      'DevOps Enthusiast',
+      'Open Source Builder',
+    ];
+    let ri = 0, ci = 0, deleting = false;
+    const typedEl = document.getElementById('typed-role');
+    function typeLoop() {
+      const current = roles[ri];
+      if (!deleting) {
+        typedEl.textContent = current.slice(0, ci + 1);
+        ci++;
+        if (ci === current.length) { deleting = true; setTimeout(typeLoop, 1800); return; }
+      } else {
+        typedEl.textContent = current.slice(0, ci - 1);
+        ci--;
+        if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+      }
+      setTimeout(typeLoop, deleting ? 45 : 85);
+    }
+    typeLoop();
+
+    // ── Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
