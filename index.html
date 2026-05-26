@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Siyabonga — Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Background canvas for particle network -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Ambient orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">SN/202302370</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid-line v"></div>
+    <div class="hero-grid-line v" style="left:66%"></div>
+    <div class="hero-grid-line h" style="top:40%"></div>
+
+    <div class="hero-left">
+      <p class="hero-tag">available for opportunities</p>
+      <h1 class="hero-name">Siya<em>bonga</em><br>Phiri</h1>
+      <p class="hero-role">
+        <span id="typed-role"></span><span class="cursor-blink"></span>
+      </p>
+      <p class="hero-desc">
+        Third-year Computer Science student building thoughtful software at the intersection of
+        systems thinking, machine learning, and human experience.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="https://github.com/Siyabonga003" target="_blank" class="btn btn-secondary">GitHub</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="terminal-card">
+        <div class="terminal-bar">
+          <span class="dot r"></span>
+          <span class="dot y"></span>
+          <span class="dot g"></span>
+          <span class="terminal-title">~/siyabonga $ whoami</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">cat profile.json</span></div>
+          <div class="t-line"><span class="t-out">{</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"name"</span><span class="t-out">:</span> <span class="t-str">"Siyabonga Phiri"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"role"</span><span class="t-out">:</span> <span class="t-str">"CS Student &amp; Developer"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"year"</span><span class="t-out">:</span> <span class="t-val">3</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"focus"</span><span class="t-out">: [</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"Software Engineering"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"LLMs &amp; AI"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"DevOps"</span><span class="t-out">,</span></div>
+          <div class="t-line" style="padding-left:2rem"><span class="t-str">"Mobile App Development"</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-out">],</span></div>
+          <div class="t-line" style="padding-left:1rem"><span class="t-key">"github"</span><span class="t-out">:</span> <span class="t-str">"@Siyabonga003"</span></div>
+          <div class="t-line"><span class="t-out">}</span></div>
+          <div class="t-line" style="margin-top:0.5rem"><span class="t-prompt">$</span><span class="t-cursor-block"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-num">01</span>
+      <h2 class="section-title">About</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>
+          I'm a <strong>third-year Computer Science student</strong> at MULUNGUSHI UNIVERSITY,
+          with a deep curiosity for how software systems work at every layer — from low-level C
+          to cloud-deployed ML pipelines.
+        </p>
+        <p>
+          My work spans <strong>full-stack web development</strong>, Mobile App Development, computer vision, large language model integrations,
+          and DevOps tooling. I'm drawn to projects that sit at the intersection of engineering
+          hardness and real human impact.
+        </p>
+        <p>
+          Beyond code, I explore competitive programming on LeetCode, contribute to open-source,
+          and think about how technology can serve communities meaningfully — including projects
+          that blend faith, digital wellness, and software design.
+        </p>
+      </div>
+      <div class="reveal">
+        <p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem">Primary Stack</p>
+        <div class="stack-grid">
+          <div class="stack-item">Java</div>
+          <div class="stack-item">Python</div>
+          <div class="stack-item">JavaScript</div>
+          <div class="stack-item">Dart / Flutter</div>
+          <div class="stack-item">SQL</div>
+          <div class="stack-item">Node.js</div>
+          <div class="stack-item">Django</div>
+          <div class="stack-item">Git / GitHub</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Projects</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <p class="project-num">001</p>
+        <h3 class="project-title">Gesture-Controlled Mouse</h3>
+        <p class="project-desc">Real-time hand tracking system that maps MediaPipe hand landmarks to cursor movement and gesture-based click/scroll controls using a webcam.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">OpenCV</span>
+          <span class="tag">MediaPipe</span><span class="tag">PyAutoGUI</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003/gesture-controlled-mouse/tree/main" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">002</p>
+        <h3 class="project-title">Local LLM Chat Interface</h3>
+        <p class="project-desc">A clean, self-hosted chat UI for interacting with local language models. Designed for privacy-first AI use without relying on external APIs.</p>
+        <div class="project-tags">
+          <span class="tag">React</span><span class="tag">TypeScript</span>
+          <span class="tag">Ollama</span><span class="tag">LLMs</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">003</p>
+        <h3 class="project-title">RAG Pipeline</h3>
+        <p class="project-desc">Retrieval-Augmented Generation pipeline enabling document-grounded question answering. Combines vector search with LLM inference for accurate, cited responses.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">LangChain</span>
+          <span class="tag">Vector DB</span><span class="tag">NLP</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">004</p>
+        <h3 class="project-title">WordLock — Digital Wellness PWA</h3>
+        <p class="project-desc">A React PWA that gates social media access behind Bible verse reading. Features streak counters, verse quizzes, AI devotional reflections, and a friends leaderboard.</p>
+        <div class="project-tags">
+          <span class="tag">React</span><span class="tag">PWA</span>
+          <span class="tag">TypeScript</span><span class="tag">AI</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">005</p>
+        <h3 class="project-title">ML Patient Classifier</h3>
+        <p class="project-desc">Decision Tree and Random Forest classifiers on a patient dataset, with SMOTE for class imbalance, hyperparameter tuning, and ensemble method evaluation.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">scikit-learn</span>
+          <span class="tag">SMOTE</span><span class="tag">Data Science</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <p class="project-num">006</p>
+        <h3 class="project-title">Glassmorphism Start Menu</h3>
+        <p class="project-desc">A custom Windows shell replacement written in C++ using GDI rendering, global mouse hooks, and power control — replacing the default Start menu with a glass-style launcher.</p>
+        <div class="project-tags">
+          <span class="tag">C++</span><span class="tag">WinAPI</span>
+          <span class="tag">GDI</span><span class="tag">Systems</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Siyabonga003" target="_blank" class="project-link">GitHub</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Skills</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-layout">
+      <div class="skill-category reveal">
+        <h3>Languages</h3>
+        <ul class="skill-list">
+          <li>Python</li><li>JavaScript</li><li>Java</li>
+          <li>Dart</li><li>SQL</li><li>HTML</li>
+          <li>CSS</li><li>Bash</li>
+        </ul>
+      </div>
+      <div class="skill-category reveal">
+        <h3>Frameworks &amp; Tools</h3>
+        <ul class="skill-list">
+          <li>Node.js &amp; Express</li><li>Django</li>
+          <li>Flutter</li><li>Angular</li><li>Git &amp; GitHub</li>
+        </ul>
+      </div>
+      <div class="skill-category reveal">
+        <h3>Domains</h3>
+        <ul class="skill-list">
+          <li>Software Engineering</li><li>LLMs &amp; AI Integration</li>
+          <li>Mobile App Development</li><li>Computer Vision</li>
+          <li>DevOps &amp; Cloud</li><li>Data Science &amp; ML</li>
+          <li>Systems Programming</li><li>Backend Engineering</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="contact-eyebrow reveal">Get in touch</p>
+    <h2 class="contact-heading reveal">Let's build something<br><em>worth shipping.</em></h2>
+    <p class="contact-sub reveal">
+      Open to internships, collaborations, and interesting problems.
+      Reach out via any of the channels below.
+    </p>
+    <div class="contact-links reveal">
+      <a href="https://github.com/Siyabonga003" target="_blank" class="btn btn-primary">GitHub</a>
+      <a href="https://www.linkedin.com/in/siyabonga-phiri-a78031410" target="_blank" class="btn btn-secondary">LinkedIn</a>
+      <a href="https://www.instagram.com" target="_blank" class="btn btn-secondary">Instagram</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-left">Designed &amp; built by <span>Siyabonga Phiri</span> — <span>2025</span></p>
+    <p class="footer-right">@Siyabonga003</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
